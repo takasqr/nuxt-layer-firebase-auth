@@ -19,3 +19,9 @@ dist
 
 # VSCode
 .vscode/
+
+# GitHub Packages
+.npmrc
+
+# 環境変数
+.env.*
