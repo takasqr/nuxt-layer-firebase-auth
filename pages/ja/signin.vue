@@ -43,7 +43,7 @@
 // import AppIcon from '@/ui/template/AppIcon.vue'
 import SigninForm from '../../components/custom/auth/SigninForm.vue'
 
-// definePageMeta({
-// middleware: ["auth-page"]
-// })
+definePageMeta({
+  middleware: ["auth-page"]
+})
 </script>
