@@ -164,7 +164,7 @@ class AccountService {
       }).catch((error) => {
         // An error happened.
         console.error('ログアウト失敗。', error)
-        reject
+        reject()
       })
     })
   }
