@@ -13,7 +13,7 @@ export default defineNuxtRouteMiddleware(async () => {
 
     if (isLoggedIn) {
       // 認証していたらプロフィールページへ
-      return navigateTo('/ja/my/profile')
+      return navigateTo('/ja/my')
     }
   }
   catch (error) {
