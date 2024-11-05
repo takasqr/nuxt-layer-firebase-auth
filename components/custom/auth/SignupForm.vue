@@ -49,7 +49,7 @@ function submit() {
   const accounService = new AccountService
   accounService.signup(email.value, password.value)
     .then(() => {
-      router.push({ path: '/ja/my/profile' })
+      router.push({ path: '/ja/my' })
     })
     .catch((error) => {
       console.error(error)

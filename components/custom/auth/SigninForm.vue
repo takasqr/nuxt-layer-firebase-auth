@@ -39,10 +39,10 @@
     <SecondaryButton block href="/ja/signup">新規登録</SecondaryButton>
 
     <div class="pt-2">
-      <LineLoginButton @finished="finishLineLogin"></LineLoginButton>
+      <LineLoginButton @finished="finishLineLogin"/>
     </div>
     <div class="pt-2">
-      <GoogleLoginButton></GoogleLoginButton>
+      <GoogleLoginButton/>
     </div>
   </div>
 </template>
@@ -93,6 +93,6 @@ function finishLineLogin(credential?: OAuthCredential | undefined) {
 }
 
 function authed() {
-  router.push({ path: '/ja/my/profile'})
+  router.push({ path: '/ja/my'})
 }
 </script>
