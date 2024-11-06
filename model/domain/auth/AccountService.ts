@@ -1,5 +1,5 @@
-import type { OAuthCredential, UserCredential, User } from 'firebase/auth'
-import {
+import type { OAuthCredential, UserCredential, User as FirebaseUser } from 'firebase/auth'
+import { 
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -12,11 +12,12 @@ import {
   unlink,
   GoogleAuthProvider,
   signInWithRedirect,
-  linkWithPopup,
+  linkWithPopup, 
   reauthenticateWithCredential,
   updateEmail,
   EmailAuthProvider } from 'firebase/auth'
-import { AuthStore } from '~/stores/AuthStore'
+import { AuthStore } from '../../../stores/AuthStore'
+import { User } from '../user/User'
 
 // 認証関連の関数を提供する
 class AccountService {
@@ -29,9 +30,10 @@ class AccountService {
       const auth = getAuth()
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
+          
           // ストアにユーザー情報を登録
           this.setAuthStore(userCredential.user)
-
+          
           resolve(userCredential)
         })
         .catch((error) => {
@@ -227,14 +229,24 @@ class AccountService {
   /**
    * Firebase の User を受け取り、AuthStore に登録する
    */
-  setAuthStore(firebaseUser: User) {
+  setAuthStore(firebaseUser: FirebaseUser) {
+
     const email = firebaseUser.email ? firebaseUser.email : ''
     const uid = firebaseUser.uid
 
     const store = AuthStore()
 
+    // Google ログインを判定
+    const googleSignIn = firebaseUser.providerData.some(
+      (provider) => provider.providerId === "google.com"
+    )
+
+    const isGoogle = googleSignIn ? true : false
+
+    const user: User = new User({ uid: uid, name: email, email: email, isLine: false, isGoogle: isGoogle })
+
     // ユーザー名は email で代用する
-    store.signin(uid, email, email)
+    store.signin(user)
   }
 
   /**
@@ -276,19 +288,18 @@ class AccountService {
 
         if (user !== null) {
           reauthenticateWithCredential(user, credential).then(() => {
+
             this.setAuthStore(user)
 
             resolve()
           })
-            .catch((error) => {
-              reject(error)
-            })
-        }
-        else {
+          .catch((error) => {
+            reject(error)
+          })
+        } else {
           reject(new Error('user が null でした。'))
         }
-      }
-      else {
+      } else {
         // signinedUser が undefined だったら
         reject(new Error('signinedUser が undefined でした。'))
       }
@@ -297,10 +308,12 @@ class AccountService {
 
   updateEmail({ email }: { email: string }): Promise<void> {
     return new Promise((resolve, reject) => {
+
       const auth = getAuth()
 
       if (auth.currentUser) {
         updateEmail(auth.currentUser, email).then(() => {
+
           // AuthStore() に新メールを反映させる
 
           resolve()

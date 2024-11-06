@@ -10,7 +10,7 @@ class User {
   // Google 連携しているかどうか
   readonly isGoogle: boolean
 
-  constructor({ uid, name, email, isLine }: { uid: string, name: string, email: string, isLine: boolean }) {
+  constructor({ uid, name, email, isLine, isGoogle }: { uid: string, name: string, email: string, isLine: boolean, isGoogle: boolean }) {
     if (!uid) {
       throw new Error('UID は必須です。')
     }
@@ -28,7 +28,7 @@ class User {
     this.name = name
     this.email = email
     this.isLine = isLine
-    this.isGoogle = false
+    this.isGoogle = isGoogle
   }
 
   // 他のUserオブジェクトと等価性を比較するメソッド
