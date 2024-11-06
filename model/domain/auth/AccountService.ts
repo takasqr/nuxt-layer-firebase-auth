@@ -1,5 +1,21 @@
-import type { OAuthCredential, UserCredential } from 'firebase/auth'
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, deleteUser, sendPasswordResetEmail, OAuthProvider, signInWithPopup, unlink, GoogleAuthProvider, signInWithRedirect, linkWithPopup } from 'firebase/auth'
+import type { OAuthCredential, UserCredential, User } from 'firebase/auth'
+import { 
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+  deleteUser,
+  sendPasswordResetEmail,
+  OAuthProvider,
+  signInWithPopup,
+  unlink,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  linkWithPopup, 
+  reauthenticateWithCredential,
+  updateEmail,
+  EmailAuthProvider } from 'firebase/auth'
 import { AuthStore } from '~/stores/AuthStore'
 
 // 認証関連の関数を提供する
@@ -13,9 +29,10 @@ class AccountService {
       const auth = getAuth()
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          // Signed in
-          // const user = userCredential.user
-          // ...
+          
+          // ストアにユーザー情報を登録
+          this.setAuthStore(userCredential.user)
+          
           resolve(userCredential)
         })
         .catch((error) => {
@@ -140,12 +157,7 @@ class AccountService {
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user
-          const email = user.email ? user.email : ''
-          const uid = user.uid
-
-          const store = AuthStore()
-          // ユーザー名は email で代用する
-          store.signin(uid, email, email)
+          this.setAuthStore(user)
 
           resolve()
         })
@@ -214,6 +226,20 @@ class AccountService {
   }
 
   /**
+   * Firebase の User を受け取り、AuthStore に登録する
+   */
+  setAuthStore(firebaseUser: User) {
+
+    const email = firebaseUser.email ? firebaseUser.email : ''
+    const uid = firebaseUser.uid
+
+    const store = AuthStore()
+
+    // ユーザー名は email で代用する
+    store.signin(uid, email, email)
+  }
+
+  /**
      * ログイン状態をチェックし、コールバック関数を実行する。
      * @returns Promise<boolean> - ユーザーがログインしている場合はtrue、そうでない場合はfalse。
      */
@@ -222,13 +248,7 @@ class AccountService {
       const auth = getAuth()
       onAuthStateChanged(auth, (user) => {
         if (user) {
-          const email = user.email ? user.email : 'user@example.com'
-          const uid = user.uid
-
-          const store = AuthStore()
-          // ユーザー名は email で代用する
-          store.signin(uid, email, email)
-
+          this.setAuthStore(user)
           resolve(true) // Promiseをtrueで解決する
         }
         else {
@@ -239,6 +259,58 @@ class AccountService {
         console.error('認証状態の監視中にエラーが発生しました', error)
         reject(error) // Promiseをエラーで拒否する
       })
+    })
+  }
+
+  reauthenticateWithCredential({ password }: { password: string }) {
+    return new Promise<void>((resolve, reject) => {
+      const signinedUser = AuthStore().signinedUser
+
+      if (signinedUser !== undefined) {
+        const currentEmail = signinedUser.email
+
+        const credential = EmailAuthProvider.credential(currentEmail, password)
+
+        console.log('ログイン成功', credential)
+
+        const auth = getAuth()
+        const user = auth.currentUser
+
+        if (user !== null) {
+          reauthenticateWithCredential(user, credential).then(() => {
+
+            this.setAuthStore(user)
+
+            resolve()
+          })
+          .catch((error) => {
+            reject(error)
+          })
+        } else {
+          reject(new Error('user が null でした。'))
+        }
+      } else {
+        // signinedUser が undefined だったら
+        reject(new Error('signinedUser が undefined でした。'))
+      }
+    })
+  }
+
+  updateEmail({ email }: { email: string }): Promise<void> {
+    return new Promise((resolve, reject) => {
+
+      const auth = getAuth()
+
+      if (auth.currentUser) {
+        updateEmail(auth.currentUser, email).then(() => {
+
+          // AuthStore() に新メールを反映させる
+
+          resolve()
+        }).catch((error) => {
+          reject(error)
+        })
+      }
     })
   }
 }
