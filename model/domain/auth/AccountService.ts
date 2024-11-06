@@ -277,6 +277,7 @@ class AccountService {
       const signinedUser = AuthStore().signinedUser
 
       if (signinedUser !== undefined) {
+        // @ts-ignore
         const currentEmail = signinedUser.email
 
         const credential = EmailAuthProvider.credential(currentEmail, password)
