@@ -9,4 +9,13 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  nitro: {
+    routeRules: {
+      '/__/auth/**': {
+        proxy: {
+          to: 'https://hiramekidev.firebaseapp.com'
+        }
+      }
+    }
+  }
 })
