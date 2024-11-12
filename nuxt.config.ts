@@ -9,13 +9,16 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  nitro: {
-    routeRules: {
-      '/__/auth/**': {
-        proxy: {
-          to: 'https://hiramekidev.firebaseapp.com'
-        }
-      }
-    }
-  }
+  // Firebase Authentication で signInWithRedirect を使うため
+  // Nuxt の nitro の設定では Cloud Run のドメインになるのでダメっぽい
+  // Cloudflare Workers で設定
+  // nitro: {
+  //   routeRules: {
+  //     '/__/auth/**': {
+  //       proxy: {
+  //         to: 'https://hiramekidev.firebaseapp.com'
+  //       }
+  //     }
+  //   }
+  // }
 })
