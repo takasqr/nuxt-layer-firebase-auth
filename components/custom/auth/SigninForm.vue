@@ -38,12 +38,12 @@
 
     <SecondaryButton block href="/ja/signup">新規登録</SecondaryButton>
 
-    <div class="pt-2">
+    <!-- <div class="pt-2">
       <LineLoginButton @finished="finishLineLogin"/>
-    </div>
-    <div class="pt-2">
+    </div> -->
+    <!-- <div class="pt-2">
       <GoogleLoginButton/>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -55,9 +55,9 @@ import TextFieldPassword from '@takasqr/tw-vue-ui/template/text-field-password/T
 import PrimaryButton from '@takasqr/tw-vue-ui/template/primary-button/PrimaryButton.vue';
 import SecondaryButton from '@takasqr/tw-vue-ui/template/secondary-button/SecondaryButton.vue'
 import Divider from '@takasqr/tw-vue-ui/basic/divider/Divider.vue'
-import LineLoginButton from './LineLoginButton.vue'
-import type { OAuthCredential } from 'firebase/auth';
-import GoogleLoginButton from './GoogleLoginButton.vue';
+// import LineLoginButton from './LineLoginButton.vue'
+// import type { OAuthCredential } from 'firebase/auth';
+// import GoogleLoginButton from './GoogleLoginButton.vue';
 
 const router = useRouter()
 
@@ -65,8 +65,8 @@ const email = ref('')
 const password = ref('')
 
 function submit() {
-  const accounService = new AccountService
-  accounService.signin(email.value, password.value)
+  const accountService = new AccountService
+  accountService.signin(email.value, password.value)
     .then(() => {
       authed()
     })
@@ -83,14 +83,14 @@ function inputPassword(value: string) {
   password.value = value
 }
 
-function finishLineLogin(credential?: OAuthCredential | undefined) {
-  // undefined じゃなかったらログイン成功
-  if (!credential == undefined) {
-    authed()
-  } else {
-    console.error('LINE ログインに失敗しました。')
-  }
-}
+// function finishLineLogin(credential?: OAuthCredential | undefined) {
+//   // undefined じゃなかったらログイン成功
+//   if (!credential == undefined) {
+//     authed()
+//   } else {
+//     console.error('LINE ログインに失敗しました。')
+//   }
+// }
 
 function authed() {
   router.push({ path: '/ja/my'})
