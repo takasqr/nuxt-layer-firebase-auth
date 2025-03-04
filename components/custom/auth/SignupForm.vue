@@ -46,8 +46,8 @@ const email = ref('')
 const password = ref('')
 
 function submit() {
-  const accounService = new AccountService
-  accounService.signup(email.value, password.value)
+  const accountService = new AccountService
+  accountService.signup(email.value, password.value)
     .then(() => {
       router.push({ path: '/ja/my' })
     })
